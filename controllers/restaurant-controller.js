@@ -1,7 +1,7 @@
 restaurantControllers = {
   getRestaurants: (req, res) => {
-    return res.render('restaurants')
-  }
-}
+    return res.render('restaurants');
+  },
+};
 
-module.exports = restaurantControllers
+module.exports = restaurantControllers;
