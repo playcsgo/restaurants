@@ -1,6 +1,7 @@
 const express = require('express')
 const routes = require('./routes')
 const { engine } = require('express-handlebars')
+const handlebarsHelpers = require('./helpers/handlebars-helpers')
 const app = express()
 const port = process.env.PORT || 3000
 const db = require('./models')
@@ -8,9 +9,10 @@ const flash = require('connect-flash')
 const session = require('express-session')
 const SESSION_SECRET = 'secret'
 const passport = require('./config/passport')
+const { getUser } = require('./helpers/auth-hlepers')
 
 
-app.engine('hbs', engine({ defaultLayout: 'main', extname: 'hbs' }))
+app.engine('hbs', engine({ defaultLayout: 'main', extname: 'hbs', helpers: handlebarsHelpers }))
 app.set('view engine', 'hbs')
 app.use(express.urlencoded({ extended: true }))
 app.use(session({
@@ -24,6 +26,7 @@ app.use(flash())
 app.use((req, res, next) => {
   res.locals.success_messages = req.flash('success_messages')
   res.locals.error_messages = req.flash('error_messages')
+  res.locals.user = getUser(req)
   next()
 })
 
