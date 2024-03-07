@@ -7,6 +7,7 @@ const db = require('./models')
 const flash = require('connect-flash')
 const session = require('express-session')
 const SESSION_SECRET = 'secret'
+const passport = require('./config/passport')
 
 
 app.engine('hbs', engine({ defaultLayout: 'main', extname: 'hbs' }))
@@ -17,6 +18,8 @@ app.use(session({
   resave: false,
   saveUninitialized: false
 }))
+app.use(passport.initialize())
+app.use(passport.session())
 app.use(flash())
 app.use((req, res, next) => {
   res.locals.success_messages = req.flash('success_messages')
