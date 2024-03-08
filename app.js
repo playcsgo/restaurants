@@ -10,7 +10,7 @@ const session = require('express-session')
 const SESSION_SECRET = 'secret'
 const passport = require('./config/passport')
 const { getUser } = require('./helpers/auth-hlepers')
-
+const methodOverride = require('method-override')
 
 app.engine('hbs', engine({ defaultLayout: 'main', extname: 'hbs', helpers: handlebarsHelpers }))
 app.set('view engine', 'hbs')
@@ -29,6 +29,7 @@ app.use((req, res, next) => {
   res.locals.user = getUser(req)
   next()
 })
+app.use(methodOverride('_method'))
 
 app.use(routes)
 app.listen(port, () => {

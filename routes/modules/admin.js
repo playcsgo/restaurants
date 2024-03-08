@@ -1,9 +1,14 @@
 const express = require('express')
 const router = express.Router()
 const adminController = require('../../controllers/admin-controller')
-const { authenticatedAdmin } = require('../../middleware/auth')
 
-router.get('/restaurants', authenticatedAdmin, adminController.getRestaurants)
+router.get('/restaurants/create', adminController.createRestaurant)
+router.get('/restaurants/:id/edit', adminController.editRestaurant)
+router.put('/restaurants/:id', adminController.putRestaurant)
+router.get('/restaurants/:id', adminController.getRestaurant)
+router.get('/restaurants', adminController.getRestaurants)
+router.delete('/restaurants/:id', adminController.deleteRestaurant)
+router.post('/restaurants', adminController.postRestaurant)
 router.get('/', (req, res) => res.redirect('/admin/restaurants'))
 
 module.exports = router
