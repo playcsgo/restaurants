@@ -2,12 +2,13 @@
 // 做一個file-help.js  將完成上傳的資料放到對外的資料夾給伺服器使用
 
 const fs = require('fs') // fs = file system, express原生模組
+const imgur = require('imgur')
+imgur.setClientId(process.env.IMGUR_CLIENT_ID)
+
 
 const localFileHandler = file => {
   return new Promise((resolve, reject) => {
-    if (!file) {
-      return resolve(null)
-    }
+    if (!file) return resolve(null)
     const fileName = `upload/${file.originalname}`
     return fs.promises.readFile(file.path)
       .then(data => fs.promises.writeFile(fileName, data))
@@ -15,7 +16,19 @@ const localFileHandler = file => {
       .catch(err => reject(err))
   })
 }
+ 
+const imgurFileHandler = file => {
+  return new Promise((resolve, reject) => {
+    if (!file) return resolve(null)
+    return imgur.uploadFile(file.path)
+      .then(img => {
+        resolve(img.link || null)
+      })
+      .catch(err => reject(err))
+  })
+}
 
 module.exports = {
-  localFileHandler
+  localFileHandler,
+  imgurFileHandler
 }

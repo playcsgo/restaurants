@@ -12,6 +12,7 @@ const passport = require('./config/passport')
 const { getUser } = require('./helpers/auth-hlepers')
 const methodOverride = require('method-override')
 const path = require('path')
+require('dotenv').config()
 
 app.engine('hbs', engine({ defaultLayout: 'main', extname: 'hbs', helpers: handlebarsHelpers }))
 app.set('view engine', 'hbs')
