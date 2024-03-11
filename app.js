@@ -11,6 +11,7 @@ const SESSION_SECRET = 'secret'
 const passport = require('./config/passport')
 const { getUser } = require('./helpers/auth-hlepers')
 const methodOverride = require('method-override')
+const path = require('path')
 
 app.engine('hbs', engine({ defaultLayout: 'main', extname: 'hbs', helpers: handlebarsHelpers }))
 app.set('view engine', 'hbs')
@@ -30,6 +31,7 @@ app.use((req, res, next) => {
   next()
 })
 app.use(methodOverride('_method'))
+app.use('/upload', express.static(path.join(__dirname, 'upload')))
 
 app.use(routes)
 app.listen(port, () => {
