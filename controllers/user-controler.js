@@ -12,7 +12,7 @@ const userController = {
       console.log('密碼不對')
       throw new Error('Passwords do NOT match!')
     }
-    User.findOne({ where: { email } })
+    return User.findOne({ where: { email } })
       .then(user => {
         if (user) {
           console.log('此信箱已被使用')
