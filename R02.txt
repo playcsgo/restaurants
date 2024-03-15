@@ -1,0 +1,5 @@
+1. restaurant model 新增一個column, viewCounts
+2. 每次findByPk就 viewCount就+1
+3. 做dashboard view.
+4. restaurantController加上 函示.
+5. 路由設定
