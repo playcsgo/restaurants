@@ -1,26 +1,35 @@
 const { Restaurant, Category } = require('../models')
+const { getOffset, getPagination } = require('../helpers/pagination-helper')
 
 restaurantControllers = {
   getRestaurants: (req, res, next) => {
+    const DEFAULT_LIMIT = 9
+    const limit = +req.query.limit || DEFAULT_LIMIT
+    const page = +req.query.page || 1
+    const offset = Math.max(getOffset(limit, page), 0)
+
     const categoryId = Number(req.query.categoryId) || ''
 
     return Promise.all([
-      Restaurant.findAll({
+      Restaurant.findAndCountAll({
         where: { ...categoryId ? { categoryId } : {} },
         include: Category,
+        limit,
+        offset,
         raw: true,
         nest: true
       }),
       Category.findAll({ raw: true })
     ]).then(([restaurants, categories ]) => {
-      const data = restaurants.map(r => ({
+      const data = restaurants.rows.map(r => ({
         ...r,
         description: r.description.substring(0, 20)
       }))
       return res.render('restaurants', {
-        restaurants: data, 
+        restaurants: data,
         categories,
-        categoryId
+        categoryId,
+        pagination: getPagination(limit, page, restaurants.count)
       })
     })
     .catch(err => next(err))
