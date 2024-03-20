@@ -9,7 +9,7 @@ const flash = require('connect-flash')
 const session = require('express-session')
 const SESSION_SECRET = 'secret'
 const passport = require('./config/passport')
-const { getUser } = require('./helpers/auth-hlepers')
+const { getUser } = require('./helpers/auth-helpers')
 const methodOverride = require('method-override')
 const path = require('path')
 require('dotenv').config()

@@ -6,3 +6,8 @@
 取得更新餐廳的表單	GET /admin/restaurants/:id/edit	adminController.editRestaurant
 更新一筆餐廳	PUT /admin/restaurants/:id	adminController.putRestaurant
 移除一筆餐廳	DELETE /admin/restaurants/:id	adminController.deleteRestaurant
+
+R03
+瀏覽 Profile	GET /users/:id	userController.getUser
+瀏覽編輯 Profile 頁面	GET /users/:id/edit	userController.editUser
+編輯 Profile	PUT /users/:id	userController.putUse
