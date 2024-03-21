@@ -35,17 +35,22 @@ restaurantControllers = {
     .catch(err => next(err))
   },
   getRestaurant: (req, res, next) => {
-    return Restaurant.findByPk(req.params.id, {
-      include: [
-        Category,
-        { model: Comment, include: User }
-      ]
-    })
-      .then(restaurant => {
-        if (!restaurant) throw new Error('Restaurant does not exist!')
-        return restaurant.increment('viewCounts')
+    const restaurantId = req.params.id
+    return Promise.all([
+      Restaurant.findByPk(restaurantId, { include: [Category] }),
+      Comment.findAll({
+        where: { restaurantId },
+        include: [ User ],
+        order: [[ 'createdAt', 'DESC' ]], 
+        raw: true,
+        nest: true
       })
-      .then(restaurant => res.render('restaurant', { restaurant: restaurant.toJSON() }))
+    ])
+      .then(([restaurant, comments]) => {
+        if (!restaurant) throw new Error('Restaurant does not exist!')
+        restaurant.increment('viewCounts')
+        res.render('restaurant', { restaurant: restaurant.toJSON(), comments })
+      })
       .catch(err => next(err))
   },
   getDashboard: (req, res, next) => {
@@ -56,6 +61,28 @@ restaurantControllers = {
     })
     .then(restaurant => {
         res.render('dashboard', {restaurant  })
+    })
+    .catch(err => next(err))
+  },
+  getFeeds:  (req, res, next) => {
+    return Promise.all([
+      Restaurant.findAll({
+        limit: 10,
+        order: [['createdAt', 'DESC']],
+        include: [Category],
+        raw: true,
+        nest: true
+      }),
+      Comment.findAll({
+        limit: 10,
+        order: [['createdAt', 'DESC']],
+        include: [User, Restaurant],
+        raw: true,
+        nest: true
+      })
+    ])
+    .then(([restaurants, comments]) => {
+      res.render('feeds', { restaurants, comments })
     })
     .catch(err => next(err))
   }
