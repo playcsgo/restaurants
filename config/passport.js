@@ -2,7 +2,7 @@ const passport = require('passport')
 const LocalStrategy = require('passport-local')
 const bcrypt = require('bcryptjs')
 const db = require('../models')
-const User = db.User
+const { User, Restaurant } = db
 // set up Passport strategy
 passport.use(new LocalStrategy(
   // customize user field
@@ -28,10 +28,14 @@ passport.serializeUser((user, done) => {
   done(null, user.id) //序列化只存id, 減少伺服器記憶體使用
 })
 passport.deserializeUser((id, done) => {
-  User.findByPk(id).then(user => {
-    user = user.toJSON()
-    return done(null, user)
+  User.findByPk(id, {
+    include: [
+      { model: Restaurant, as: 'FavoritedRestaurants'},
+      { model: Restaurant, as: 'LikedRestaurants'}
+    ]
   })
+  .then(user => { return done(null, user.toJSON())})
+  .catch(err => done(err))
 })
 
 module.exports = passport

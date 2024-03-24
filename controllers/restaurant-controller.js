@@ -1,5 +1,6 @@
 const { Restaurant, Category, Comment, User } = require('../models')
 const { getOffset, getPagination } = require('../helpers/pagination-helper')
+const restaurant = require('../models/restaurant')
 
 restaurantControllers = {
   getRestaurants: (req, res, next) => {
@@ -7,7 +8,6 @@ restaurantControllers = {
     const limit = +req.query.limit || DEFAULT_LIMIT
     const page = +req.query.page || 1
     const offset = Math.max(getOffset(limit, page), 0)
-
     const categoryId = Number(req.query.categoryId) || ''
 
     return Promise.all([
@@ -21,9 +21,13 @@ restaurantControllers = {
       }),
       Category.findAll({ raw: true })
     ]).then(([restaurants, categories ]) => {
+      const favoritedRestaurantsId = req.user.FavoritedRestaurants.map(fr => fr.id)
+      const likedRestaurantsId = req.user.LikedRestaurants.map(lr => lr.id)
       const data = restaurants.rows.map(r => ({
         ...r,
-        description: r.description.substring(0, 20)
+        description: r.description.substring(0, 20),
+        isFavorited: favoritedRestaurantsId.includes(r.id),
+        isLiked: likedRestaurantsId.includes(r.id)
       }))
       return res.render('restaurants', {
         restaurants: data,
@@ -36,20 +40,26 @@ restaurantControllers = {
   },
   getRestaurant: (req, res, next) => {
     const restaurantId = req.params.id
-    return Promise.all([
-      Restaurant.findByPk(restaurantId, { include: [Category] }),
-      Comment.findAll({
-        where: { restaurantId },
-        include: [ User ],
-        order: [[ 'createdAt', 'DESC' ]], 
-        raw: true,
-        nest: true
-      })
-    ])
-      .then(([restaurant, comments]) => {
+
+    return Restaurant.findByPk(restaurantId, {
+      include: [
+        Category,
+        { model: Comment, order: [['createdAt', 'DESC']], include: User, },
+        { model: User, as: 'FavoritedUsers', raw: true },
+        // 找出喜歡這間餐廳的user, 用some看看登入的user在不在裡面, 比map快
+        { model: User, as: 'LikedUser', raw: true}
+      ]
+    })
+      .then(restaurant => {
         if (!restaurant) throw new Error('Restaurant does not exist!')
         restaurant.increment('viewCounts')
-        res.render('restaurant', { restaurant: restaurant.toJSON(), comments })
+        const isFavorited = restaurant.FavoritedUsers.some(f => f.id === req.user.id)
+        const isLiked = restaurant.LikedUser.some(l => l.id === req.user.id)
+        res.render('restaurant', {
+          restaurant: restaurant.toJSON(),
+          isFavorited,
+          isLiked
+        })
       })
       .catch(err => next(err))
   },
