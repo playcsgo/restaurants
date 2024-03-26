@@ -1,5 +1,5 @@
 const db = require('../models')
-const { User, Comment, Restaurant, Favorite, Like } = db
+const { User, Comment, Restaurant, Favorite, Like, Followship } = db
 const bcrypt = require('bcryptjs')
 const { imgurFileHandler } = require('../helpers/file-help')
 
@@ -141,6 +141,63 @@ const userController = {
     })
     .then(() => res.redirect('back'))
     .catch(err => next(err))
+  },
+  getUserTop: (req, res, next) => {
+    return User.findAll({
+      include: [ { model: User, as: 'Followers' } ],
+    })
+    .then(users => {
+      const results = users
+      .map(user => ({
+        ...user.toJSON(),
+        followerCount: user.Followers.length,
+        isFollowed: req.user.Followings.some(FollowingUser => FollowingUser.id === user.id)
+      }))
+      .sort((a,b) => b.followerCount - a.followerCount)
+      res.render('topUsers', { users: results })
+    })
+    .catch(err => next(err))
+  },
+  addFollowing: (req, res, next) => {
+    const followerId = +req.user.id
+    const followingId = +req.params.userId
+    return Promise.all([
+      User.findByPk(req.params.userId),
+      Followship.findOne({
+        where: { followerId, followingId }
+      })
+    ])
+    .then(([user, followship]) => {
+      if (!user) throw new Error('user does not exist!')
+      if (followship) throw new Error('user has been followed!')
+      return Followship.create({ 
+        followerId,
+        followingId })
+    })
+    .then(f => {
+      console.log(f)
+      res.redirect('/users/top')
+    })
+    .catch(err => next(err))
+  },
+  removeFollowing: (req, res, next) => {
+    userId = req.params.userId
+    return Followship.findOne({ where: {
+      followerId: req.user.id,
+      followingId: req.params.userId
+    } })
+    .then(followship => {
+      if (!followship) throw new Error("You have not FOLLOW this USER!")
+      return followship.destroy()
+    })
+    .then(() => res.redirect('/users/top'))
+    .catch(err => next(err))
+  },
+  logout: (req, res, next) => {
+    req.logout(() => {
+      req.flash('success_messages', '登出成功！')
+      res.redirect('/signin')
+    })
   }
 }
 
