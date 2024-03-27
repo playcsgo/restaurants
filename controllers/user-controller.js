@@ -88,7 +88,7 @@ const userController = {
   },
   addFavorite: (req, res, next) => {
     userId = req.user.id
-    restaurantId = req.params.id
+    restaurantId = req.params.restaurantId
     return Promise.all([
       Restaurant.findByPk(restaurantId),
       Favorite.findOne({
@@ -98,6 +98,8 @@ const userController = {
     .then(([restaurant, favorite]) => {
       if (!restaurant) throw new Error('Restaurant does not exist!') //比較嚴謹 但囉嗦
       if (favorite) throw new Error('You have favorited this restaurant!')
+      console.log('---------------------')
+      console.log(userId, restaurantId)
       return Favorite.create({ userId, restaurantId})
     })
     .then(() => res.redirect('back'))
@@ -105,7 +107,7 @@ const userController = {
   },
   removeFavorite: (req, res, next) => {
     userId = req.user.id
-    restaurantId = req.params.id
+    restaurantId = req.params.restaurantId
     return Favorite.findOne({ where: { userId, restaurantId } })
     .then(favorite => {
       if (!favorite) throw new Error("You have not favorited this restaurant!")
