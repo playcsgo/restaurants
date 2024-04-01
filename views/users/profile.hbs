@@ -1,25 +1,93 @@
 <div class="container">
-  <div class="d-flex flex-row">
+  <div class="d-flex flex-row border my-3">
     <div class="m-3">
-      <img src="{{ user.image }}" alt="" style="width:300px; height:300px;">
+      <img src="{{ user.image }}" class="card-img-top" style="width:300px; height:300px;">
     </div>
     <div class="m-3">
       <p>{{ user.name }}</p>
       <p>{{ user.email }}</p>
-      <p>{{ comments.count }} 已評論餐廳</p>
-      <a href="/users/{{user.id}}/edit" class="btn btn-primary">edit</a>
+      <p>{{ user.commentsCount }} 已評論餐廳</p>
+      <p>{{ user.favoritedCount }} 收藏餐廳</p>
+      <p>{{ user.followingsCount }} followings(已追蹤)</p>
+      <p>{{ user.followersCount }} followers(追隨者)</p>
+      {{#ifCond user.id userId}}
+        <a href="/users/{{user.id}}/edit" class="btn btn-primary">edit</a>
+      {{else}}:
+        {{#if user.isFollowed}}
+          <form action="/following/{{user.id}}?_method=DELETE" method="POST">
+            <button class="btn btn-danger">取消追蹤</button>
+          </form>
+        {{else}}
+          <form action="/following/{{user.id}}" method="POST">
+            <button class="btn btn-primary">追蹤</button>
+          </form>
+        {{/if}}
+      {{/ifCond}}
     </div>
   </div>
-  
-  <div class="border">
-    <div style="background-color: lightgrey;">
-      <p>{{ comments.count }} 已評論餐廳</p>
+  {{!-- 第一行 --}}
+  <div class="d-flex flex-row">
+    {{!-- 左邊 1/3 --}}
+    <div class="card col-3 mx-1 h-90 mt-3 p-2">
+      <div class="comment-counts">
+        <p class="bg-secondary-subtle"> {{user.followingsCount}} followings (追蹤者) </p>
+      </div>
+      <div class="row d-flex flex-row ">
+        {{#each user.Followings}}
+          <div class="col-2">
+            <a href="/users/{{this.id}}">
+              <img src="{{this.image}}" alt="" class="img-fluid rounded" style="width: 50px; height: 50px;">
+            </a>
+          </div>
+        {{/each}}
+      </div>
     </div>
-    <div class="d-flex flex-row">
-      {{#each comments.rows}}
-        <div class="m-2">
-          <a href="/restaurants/{{this.restaurantId}}">
-            <img src="{{this.Restaurant.image}}" alt="" style="width:80px; height:80px;">
+
+    {{!-- 右邊 2/3 --}}
+    <div class="card col-7 mx-1 h-90 mt-3 p-2">
+      <div class="comment-counts">
+        <p class="bg-secondary-subtle"> {{user.commentsCount}} 已評論餐廳 </p>
+      </div>
+      <div class="row d-flex flex-row ">
+        {{#each comments}}
+          <div class="col-1">
+            <a href="/restaurants/{{this.Restaurant.id}}">
+              <img src="{{this.Restaurant.image}}" alt="" class="img-fluid rounded">
+            </a>
+          </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+
+  {{!-- 第二行 --}}
+<div class="d-flex flex-row">
+  {{!-- 左邊 1/3 --}}
+  <div class="card col-3 mx-1 h-90 mt-3 p-2">
+    <div class="comment-counts">
+      <p class="bg-secondary-subtle"> {{user.followersCount}} followers (追隨者) </p>
+    </div>
+    <div class="row d-flex flex-row ">
+      {{#each user.Followers}}
+        <div class="col-2">
+          <a href="/users/{{this.id}}">
+            <img src="{{this.image}}" alt="" class="rounded" style="width: 50px; height: 50px;">
+          </a>
+        </div>
+      {{/each}}
+    </div>
+  </div>
+
+  {{!-- 右邊 2/3 --}}
+  <div class="card col-7 h-90 mx-1 mt-3 p-2">
+    <div class="comment-counts">
+      <p class="bg-secondary-subtle"> {{user.favoritedCount}} 已收藏餐廳 </p>
+    </div>
+    <div class="row d-flex flex-row ">
+      {{#each user.FavoritedRestaurants}}
+        <div class="col-1">
+          <a href="/restaurants/{{this.id}}">
+            <img src="{{this.image}}" alt="" class="img-fluid rounded">
           </a>
         </div>
       {{/each}}

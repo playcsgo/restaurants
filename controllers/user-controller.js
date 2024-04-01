@@ -45,18 +45,47 @@ const userController = {
     res.redirect('/signin')
   },
   getUser: (req, res, next) => {
-    const id = req.params.id || req.user.id
+    const id = req.params.id
+    let userId
+    if (req.user) {
+      const userId = req.user.id
+    }
     return Promise.all([
-      User.findByPk(id, { raw: true }),
-      Comment.findAndCountAll({
-        where: {user_id: id},
-        include: [Restaurant],
+      User.findByPk(id, {
+        include: [
+          { model: Comment },
+          { model: Restaurant, as: 'FavoritedRestaurants' },
+          { model: User, as: 'Followers' },
+          { model: User, as: 'Followings' }
+        ]
+        }),
+      Comment.findAll({
+        include: Restaurant,
+        where: { user_id: id },
         raw: true,
         nest: true
       })
     ])
     .then(([user, comments]) => {
-      return res.render('users/profile', { user, comments })
+      user = {
+        ...user.toJSON(),
+        commentsCount: user.Comments && user.Comments.length,
+        favoritedCount: user.FavoritedRestaurants && user.FavoritedRestaurants.length,
+        followingsCount: user.Followings && user.Followings.length,
+        followersCount: user.Followers && user.Followers.length,
+        isFollowed: req.user && req.user.Followings.some(f => f.id === user.id)
+      }
+      const displayRestaurant = new Set()
+      comments = comments.filter(comment => {
+        if (!displayRestaurant.has(comment.Restaurant.id)) {
+          displayRestaurant.add(comment.Restaurant.id)
+          return true
+        }
+        user.commentsCount--
+        return false
+      })
+      
+      res.render('users/profile', { user, comments, userId })
     })
     .catch(err => next(err))
   },
@@ -98,8 +127,6 @@ const userController = {
     .then(([restaurant, favorite]) => {
       if (!restaurant) throw new Error('Restaurant does not exist!') //比較嚴謹 但囉嗦
       if (favorite) throw new Error('You have favorited this restaurant!')
-      console.log('---------------------')
-      console.log(userId, restaurantId)
       return Favorite.create({ userId, restaurantId})
     })
     .then(() => res.redirect('back'))
@@ -178,7 +205,7 @@ const userController = {
     })
     .then(f => {
       console.log(f)
-      res.redirect('/users/top')
+      res.redirect('back')
     })
     .catch(err => next(err))
   },
@@ -192,7 +219,7 @@ const userController = {
       if (!followship) throw new Error("You have not FOLLOW this USER!")
       return followship.destroy()
     })
-    .then(() => res.redirect('/users/top'))
+    .then(() => res.redirect('back'))
     .catch(err => next(err))
   },
   logout: (req, res, next) => {
