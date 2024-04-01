@@ -1,5 +1,5 @@
 const express = require('express')
-const routes = require('./routes')
+const { pages } = require('./routes')
 const { engine } = require('express-handlebars')
 const handlebarsHelpers = require('./helpers/handlebars-helpers')
 const app = express()
@@ -34,7 +34,8 @@ app.use((req, res, next) => {
 app.use(methodOverride('_method'))
 app.use('/upload', express.static(path.join(__dirname, 'upload')))
 
-app.use(routes)
+app.use(pages)
+
 app.listen(port, () => {
   console.info(`Example app listening on port ${port}!`)
 })
