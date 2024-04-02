@@ -1,18 +1,11 @@
 const { User, Restaurant, Category } = require('../../models')
 const { imgurFileHandler } = require('../../helpers/file-help')
 
+const adminService = require('../../services/admin-service')
 
 const adminController = {
   getRestaurants: (req, res, next) => {
-    return Restaurant.findAll({
-      raw: true,
-      nest: true,
-      include: [Category]
-    })
-    .then(restaurants => {
-      res.render('admin/restaurants', { restaurants })
-    })
-    .catch(err => next(err))
+    adminService.getRestaurants(req, (err, data) => err ? next(err) : res.render('admin/restaurants', data ))
   },
   createRestaurant: (req, res, next) => {
     Category.findAll({
