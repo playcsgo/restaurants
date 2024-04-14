@@ -1,35 +1,12 @@
 const { Comment, User, Restaurant } = require('../../models')
+const commentServices = require('../../services/comment-service')
 
 const commentController = {
   postComment: (req, res, next) => {
-    const { restaurantId, text } = req.body
-    const userId = req.user.id
-
-    if (!text) throw new Error('Comment is empty!')
-
-    return Promise.all([
-      User.findByPk(userId),
-      Restaurant.findByPk(restaurantId)
-    ]).then(([user, restaurant]) => {
-      if (!user) throw new Error('user does not exist!')
-      if (!restaurant) throw new Error('restaurant does not exist!')
-      return Comment.create({
-        text,
-        restaurantId,
-        userId
-      })
-    })
-    .then(() => res.redirect(`/restaurants/${restaurantId}`))
-    .catch(err => next(err))
+    commentServices.postComment(req, (err, data) => err ? next(err) : res.redirect(`/restaurants/${data.postedComment.restaurantId}`))
   },
   deleteComment: (req, res, next) => {
-    Comment.findByPk(req.params.id)
-      .then(comment => {
-        if(!comment) throw new Error('Comment does not exist!')
-        return comment.destroy()
-      })
-      .then(currentRestaurant => res.redirect(`/restaurants/${currentRestaurant.restaurantId}`))
-      .catch(err => next(err))
+    commentServices.deleteComment(req, (err, data) => err ? next(err) : res.redirect(`/restaurants/${data.deletedComment.restaurantId}`))
   }
 }
 

@@ -8,8 +8,20 @@ module.exports = {
       req.flash('error_messages', `${err}`)  
     }
     res.redirect('back')
-    console.log('進到error handler')
 
     next(err)
+  },
+  apiErrorHandler (err, req, res, next) {
+    if (err instanceof Error) {  
+      res.status(500).json({
+        status: 'error',
+        message: `${err.name}: ${err.message}`
+      })
+    } else {
+      res.status(500).json({
+        status: 'error',
+        message: `${err}`
+      })
+    }
   }
 }

@@ -1,11 +1,23 @@
 const { Restaurant, Category, Comment, User, Favorite } = require('../../models')
 const { getOffset, getPagination } = require('../../helpers/pagination-helper')
-const restaurantService = require('../../services/restaurant-service')
+const restaurantServices = require('../../services/restaurant-services')
 
-restaurantControllers = {
+apiRestController = {
   getRestaurants: (req, res, next) => {
-    restaurantService.getRestaurants(req, (err, data) => err ? next(err) : res.json(data))
+    restaurantServices.getRestaurants(req, (err, data) => err ? next(err) : res.json(data))
+  },
+  getRestaurant: (req, res, next) => {
+    restaurantServices.getRestaurant(req, (err, data) => err ? next(err) : res.json(data))
+  },
+  getDashboard: (req, res, next) => {
+    restaurantServices.getDashboard(req, (err, data) => err ? next(err) : res.json(data))
+  },
+  getFeeds:  (req, res, next) => {
+    restaurantServices.getFeeds(req, (err, data) => err ? next(err) : res.json(data))
+  },
+  getTopRestaurants: (req, res,next) => {
+    restaurantServices.getTopRestaurants(req, (err, data) => err ? next(err) : res.json(data))
   }
 }
 
-module.exports = restaurantControllers
+module.exports = apiRestController

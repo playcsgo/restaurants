@@ -1,4 +1,5 @@
 const { Category } = require('../../models')
+const categoryService = require('../../services/category-service')
 
 const categoryController = {
   getCategories: (req, res, next) => {
@@ -12,31 +13,13 @@ const categoryController = {
       .catch(err => next(err))
   },
   postCategories: (req, res, next) => {
-    const { name } = req.body
-    if (!name) throw new Error('Category name is required!')
-   return Category.create({ name })
-      .then(() => res.redirect('/admin/categories'))
-      .catch(err => next(err))
+    categoryService.postCategories(req, (err, data) => err ? next(err) : res.redirect('/admin/categories'))
   },
   putCategories: (req, res, next) => {
-    const { name } = req.body
-    if(!name) throw new Error('Category name is required')
-    return Category.findByPk(req.params.id)
-      .then(category => {
-        if (!category) throw new Error('Category does not exist!')
-        return Category.update({ name }, { where: { id: req.params.id } })
-      })
-      .then(() => res.redirect('/admin/categories'))
-      .catch(err => next(err))
+    categoryService.putCategories(req, (err, data) => err ? next(err) : res.redirect('/admin/categories'))
   },
   deleteCategories: (req, res, next) => {
-    return Category.findByPk(req.params.id)
-      .then(category => {
-        if (!category) throw new Error('Category does not exist!')
-        return category.destroy()
-      })
-      .then(() => res.redirect('/admin/categories'))
-      .catch(err => next(err))
+    categoryService.deleteCategories(req, (err, data) => err ? next(err) : res.redirect('/admin/categories'))
   }
 }
 

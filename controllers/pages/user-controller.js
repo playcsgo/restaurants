@@ -3,34 +3,19 @@ const { User, Comment, Restaurant, Favorite, Like, Followship } = db
 const bcrypt = require('bcryptjs')
 const { imgurFileHandler } = require('../../helpers/file-help')
 
+const userService = require('../../services/user-services')
+
+
 const userController = {
   signUpPage: (req, res) => {
     res.render('signup')
   },
   signUp: (req, res, next) => {
-    const { name, email, password, passwordCheck} = req.body
-    if (password !== passwordCheck) {
-      console.log('密碼不對')
-      throw new Error('Passwords do NOT match!')
-    }
-    return User.findOne({ where: { email } })
-      .then(user => {
-        if (user) {
-          console.log('此信箱已被使用')
-          throw new Error('Email already exists')
-        }
-        return bcrypt.hash(password, 10)
-      })
-      .then(hash => User.create({
-        name,
-        email,
-        password: hash
-      }))
-      .then(() => {
-        req.flash('success_messages', '註冊成功')
-        res.redirect('/signin')
-      })
-      .catch(err => next(err))
+    userService.signUp(req, (err, cb) => {
+      if (err) return next(err)
+      req.flash('success_messages', '註冊成功')
+      res.redirect('/signIn')
+    })
   },
   signInPage: (req, res) => {
     res.render('signin')
@@ -45,49 +30,11 @@ const userController = {
     res.redirect('/signin')
   },
   getUser: (req, res, next) => {
-    const id = req.params.id
-    let userId
-    if (req.user) {
-      const userId = req.user.id
-    }
-    return Promise.all([
-      User.findByPk(id, {
-        include: [
-          { model: Comment },
-          { model: Restaurant, as: 'FavoritedRestaurants' },
-          { model: User, as: 'Followers' },
-          { model: User, as: 'Followings' }
-        ]
-        }),
-      Comment.findAll({
-        include: Restaurant,
-        where: { user_id: id },
-        raw: true,
-        nest: true
-      })
-    ])
-    .then(([user, comments]) => {
-      user = {
-        ...user.toJSON(),
-        commentsCount: user.Comments && user.Comments.length,
-        favoritedCount: user.FavoritedRestaurants && user.FavoritedRestaurants.length,
-        followingsCount: user.Followings && user.Followings.length,
-        followersCount: user.Followers && user.Followers.length,
-        isFollowed: req.user && req.user.Followings.some(f => f.id === user.id)
-      }
-      const displayRestaurant = new Set()
-      comments = comments.filter(comment => {
-        if (!displayRestaurant.has(comment.Restaurant.id)) {
-          displayRestaurant.add(comment.Restaurant.id)
-          return true
-        }
-        user.commentsCount--
-        return false
-      })
-      
-      res.render('users/profile', { user, comments, userId })
-    })
-    .catch(err => next(err))
+    userService.getUser(req, (err, data) => err ? next(err) : res.render('users/profile', {
+      user: data.user,
+      comments: data.comments,
+      userId: data.userId
+    }))
   },
   editUser: (req, res, next) => {
     return User.findByPk(req.params.id, { raw: true })
@@ -97,51 +44,13 @@ const userController = {
     .catch(err => next(err))
   },
   putUser: (req, res, next) => {
-    const { name } = req.body
-    const { file } = req
-    return Promise.all([
-      User.findByPk(req.params.id),
-      imgurFileHandler(file)
-    ])
-    .then(([user, imagePath]) => {
-      return user.update({
-        name,
-        image: imagePath || user.image
-      })
-    })
-    .then(() => {
-      req.flash('success_messages', '使用者資料編輯成功')
-      res.redirect(`/users/${req.user.id}`)
-    })
-    .catch(err => next(err))
+    userService.putUser(req, (err, data) => err ? next(err) :  res.redirect(`/users/${req.user.id}`))
   },
   addFavorite: (req, res, next) => {
-    userId = req.user.id
-    restaurantId = req.params.restaurantId
-    return Promise.all([
-      Restaurant.findByPk(restaurantId),
-      Favorite.findOne({
-        where: { userId, restaurantId }
-      })
-    ])
-    .then(([restaurant, favorite]) => {
-      if (!restaurant) throw new Error('Restaurant does not exist!') //比較嚴謹 但囉嗦
-      if (favorite) throw new Error('You have favorited this restaurant!')
-      return Favorite.create({ userId, restaurantId})
-    })
-    .then(() => res.redirect('back'))
-    .catch(err => next(err))
+    userService.addFavorite(req, (err, data) => err ? next(err) : res.redirect('back'))
   },
   removeFavorite: (req, res, next) => {
-    userId = req.user.id
-    restaurantId = req.params.restaurantId
-    return Favorite.findOne({ where: { userId, restaurantId } })
-    .then(favorite => {
-      if (!favorite) throw new Error("You have not favorited this restaurant!")
-      return favorite.destroy()
-    })
-    .then(() => res.redirect('back'))
-    .catch(err => next(err))
+    userService.removeFavorite(req, (err, data) => err ? next(err) : res.redirect('back'))
   },
   logout: (req, res, next) => {
     req.logout(() => {
@@ -172,42 +81,10 @@ const userController = {
     .catch(err => next(err))
   },
   getUserTop: (req, res, next) => {
-    return User.findAll({
-      include: [ { model: User, as: 'Followers' } ],
-    })
-    .then(users => {
-      const results = users
-      .map(user => ({
-        ...user.toJSON(),
-        followerCount: user.Followers.length,
-        isFollowed: req.user.Followings.some(FollowingUser => FollowingUser.id === user.id)
-      }))
-      .sort((a,b) => b.followerCount - a.followerCount)
-      res.render('topUsers', { users: results })
-    })
-    .catch(err => next(err))
+    userService.getUserTop(req, (err, data) => err ? next(err) : res.render('topUsers', { users: data.results }))
   },
   addFollowing: (req, res, next) => {
-    const followerId = +req.user.id
-    const followingId = +req.params.userId
-    return Promise.all([
-      User.findByPk(req.params.userId),
-      Followship.findOne({
-        where: { followerId, followingId }
-      })
-    ])
-    .then(([user, followship]) => {
-      if (!user) throw new Error('user does not exist!')
-      if (followship) throw new Error('user has been followed!')
-      return Followship.create({ 
-        followerId,
-        followingId })
-    })
-    .then(f => {
-      console.log(f)
-      res.redirect('back')
-    })
-    .catch(err => next(err))
+    userService.addFollowing(req, (err, data) => err ? next(err) : res.redirect('back'))
   },
   removeFollowing: (req, res, next) => {
     userId = req.params.userId

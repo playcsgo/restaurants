@@ -13,7 +13,7 @@ const { authenticatedAdmin } = require('../../middleware/auth')
 
 const upload = require('../../middleware/multer')
 
-router.use('/admin', authenticatedAdmin, admin)
+router.use('/admin', authenticated, authenticatedAdmin, admin)
 router.get('/signup', userController.signUpPage)
 router.post('/signup', userController.signUp)
 router.get('/logout', userController.logout)

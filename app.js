@@ -1,3 +1,7 @@
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
+
 const express = require('express')
 const { pages, apis } = require('./routes')
 const { engine } = require('express-handlebars')
@@ -12,11 +16,14 @@ const passport = require('./config/passport')
 const { getUser } = require('./helpers/auth-helpers')
 const methodOverride = require('method-override')
 const path = require('path')
-require('dotenv').config()
+
+
+
 
 app.engine('hbs', engine({ defaultLayout: 'main', extname: 'hbs', helpers: handlebarsHelpers }))
 app.set('view engine', 'hbs')
 app.use(express.urlencoded({ extended: true }))
+app.use(express.json()) 
 app.use(session({
   secret: SESSION_SECRET,
   resave: false,
