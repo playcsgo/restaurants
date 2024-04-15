@@ -96,7 +96,7 @@ const userService = {
   getUser: (req, cb) => {
     const id = +req.params.id
     let userId
-    if (req.user.id) {
+    if (req.user && req.user.id) {
       userId = req.user.id
     }
     return Promise.all([

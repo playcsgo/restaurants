@@ -65,7 +65,7 @@ const adminServices = {
       .catch(err => cb(err))
   },
   patchUser: (req, cb) => {
-    const id = req.params.id
+    const id = Number(req.params.id)
     return User.findByPk(id)
       .then(user => {
         if (!user) throw new Error('奇怪, 沒這人?')
@@ -73,6 +73,7 @@ const adminServices = {
           req.flash('error_messages', '禁止變更 root 權限')
           return res.redirect('back')
         }
+        req.flash('success_messages','使用者權限變更成功')
         return user.update({ isAdmin: !user.isAdmin })
       })
       .then(updatedUser => {

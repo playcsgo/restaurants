@@ -87,23 +87,7 @@ const userController = {
     userService.addFollowing(req, (err, data) => err ? next(err) : res.redirect('back'))
   },
   removeFollowing: (req, res, next) => {
-    userId = req.params.userId
-    return Followship.findOne({ where: {
-      followerId: req.user.id,
-      followingId: req.params.userId
-    } })
-    .then(followship => {
-      if (!followship) throw new Error("You have not FOLLOW this USER!")
-      return followship.destroy()
-    })
-    .then(() => res.redirect('back'))
-    .catch(err => next(err))
-  },
-  logout: (req, res, next) => {
-    req.logout(() => {
-      req.flash('success_messages', '登出成功！')
-      res.redirect('/signin')
-    })
+    userService.removeFollowing(req, (err, data) => err ? next(err) : res.redirect('back'))
   }
 }
 
