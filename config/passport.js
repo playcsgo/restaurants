@@ -1,6 +1,7 @@
 const passport = require('passport')
 const LocalStrategy = require('passport-local')
 const FacebookStrategy = require('passport-facebook')
+const GoogleStrategy  = require('passport-google-oauth20')
 const bcrypt = require('bcryptjs')
 const db = require('../models')
 const { User, Restaurant } = db
@@ -60,6 +61,33 @@ function(accessToken, refreshToken, profile, cb) {
     })
 }
 ))
+
+// google-oauth
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: process.env.GOOGLE_CALLBACK,
+},
+function(accessToken, refreshToken, profile, cb) {
+  const { name, email } = profile._json
+  User.findOne({ where: { email } })
+    .then(user => {
+      if (user) return cb(null, user)
+      const randomPassword = Math.random().toString(36).slice(-8)
+      bcrypt
+        .genSalt(10)
+        .then(salt => bcrypt.hash(randomPassword, salt))
+        .then(hash => User.create({
+          name,
+          email,
+          password: hash
+        }))
+        .then(user => cb(null, user))
+        .catch(err => cb(err, false))
+    })
+}
+));
+
 
 // JWT strategy
 passport.use(new JWTStrategy(jwtOptions, (jwtPayload, done) => {
