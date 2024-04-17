@@ -17,8 +17,17 @@ const { getUser } = require('./helpers/auth-helpers')
 const methodOverride = require('method-override')
 const path = require('path')
 const routes = require('./routes')
+const cors = require('cors')
 
-
+app.use(
+  cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    preflightContinue: false
+  })
+)
 
 app.engine('hbs', engine({ defaultLayout: 'main', extname: 'hbs', helpers: handlebarsHelpers }))
 app.set('view engine', 'hbs')
