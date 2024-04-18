@@ -23,7 +23,15 @@ module.exports = {
       name: 'user2',
       created_at: new Date(),
       updated_at: new Date()
-    }], {})
+    },{
+      email: 'test',
+      password: await bcrypt.hash('test', 10),
+      is_admin: true,
+      name: 'test',
+      image: "https://i.imgur.com/7BjXmRm.png",
+      created_at: new Date(),
+      updated_at: new Date()
+    },], {})
   },
   down: async (queryInterface, Sequelize) => {
     await queryInterface.bulkDelete('Users', {})
