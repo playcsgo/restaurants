@@ -1,9 +1,9 @@
 {
   "development": {
-    "username": "admin",
-    "password": "tatu0204",
-    "database": "rest",
-    "host": "rest.cb4qgeoy2c7h.ap-northeast-1.rds.amazonaws.com",
+    "username": "root",
+    "password": "password",
+    "database": "forum",
+    "host": "127.0.0.1",
     "dialect": "mysql"
   },
   "production": {
