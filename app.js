@@ -31,8 +31,11 @@ app.use(
 
 app.engine('hbs', engine({ defaultLayout: 'main', extname: 'hbs', helpers: handlebarsHelpers }))
 app.set('view engine', 'hbs')
-app.use(express.urlencoded({ extended: true }))
+
 app.use(express.json()) 
+app.use(express.urlencoded({ extended: true }))
+
+
 app.use(session({
   secret: SESSION_SECRET,
   resave: false,
