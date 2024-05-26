@@ -1,195 +1,146 @@
-const request = require('supertest')
-const chai = require('chai')
-const sinon = require('sinon')
+const request = require('supertest') // 引入測試用HTTP
+const chai = require('chai') //引入斷言庫
 const should = chai.should()
+const sinon = require('sinon')  // 引入 spy
+// const shoud = chai.should()  //可能不用
+const { expect } = require('chai')
 
 const app = require('../app')
-const { createModelMock, createControllerProxy, mockRequest, mockResponse, mockNext } = require('../helpers/unit-test-helper');
+const { createModelMock, createControllerProxy, mockRequest, mockResponse, mockNext } = require('../helpers/unit-test-helper')
 
-describe('# R01', () => {
-  describe('登入測試: POST /signin', function(){
-    // 以下測試會發出請求，測試資料庫內是否有作業指定的使用者資料
-    // 測試資料的來源是真實的資料庫
-    it('#1 密碼錯誤', function(done){
+describe('R01', () => {
+  context('[登入測試]: POST /signin', () => {
+    it('#2 密碼錯誤', done => {
       request(app)
-        // 對 POST /signin 發出請求，參數是錯誤的密碼
+        // 使用POST 訪問 url: /signin
+        .post('/signin')
+        // 設定 Content-Type
+        .type('urlencoded')
+        // .send 發送form.  email = test, passwrod = test
+        .send('email=root@example.com&password=abc')
+        // .expect 檢查 headers是否有 Location = /signin
+        .expect('Location', '/signin')
+        // 檢查 headers 是否有302.  同時使用done結束此it
+        .expect(302, done)
+    })
+
+    it('#3 帳號錯誤', done => {
+      request(app)
         .post('/signin')
         .type('urlencoded')
-        .send('email=root@example.com&password=123')
-        // 期待登入驗證回應失敗，重新導向 /signin
+        // 輸入錯的帳號
+        .send('email=root&password=12345678')
+        // 期待 導向回signin /signin
         .expect('Location', '/signin')
         .expect(302, done)
     })
 
-    it('#2 帳號錯誤', function(done){
+    it('#4 登入成功', done => {
       request(app)
-        // 對 POST /signin 發出請求，參數是錯誤的帳號
-        .post('/signin')
-        .type('urlencoded')
-        .send('email=tu&password=12345678')
-        // 期待登入驗證回應失敗，重新導向 /signin
-        .expect('Location', '/signin')
-        .expect(302, done)
-    })
-
-    it('#3 成功登入', function(done){
-      request(app)
-        // 對 POST /signin 發出請求，參數是作業指定的使用者帳號密碼
         .post('/signin')
         .type('urlencoded')
         .send('email=root@example.com&password=12345678')
-        // 期待登入驗證成功，重新導向 /restaurants 
         .expect('Location', '/restaurants')
         .expect(302, done)
     })
-  });
-
-  describe('# 使用者權限管理', function () {
-    // 前置準備
+  })
+  
+  describe('使用者權限管理', () => {
     before(() => {
-      // 製作假資料
-      // 本 context 會用這筆資料進行測試
-      this.UserMock = createModelMock('User', [{
-        id: 1,
-        email: 'root@example.com',
-        name: 'admin',
-        isAdmin: false,
-      }])
-
-      // 修改 adminController 中的資料庫連線設定，由連向真實的資料庫 -> 改為連向模擬的 User table
-      this.adminController = createControllerProxy('../controllers/admin-controller', { User: this.UserMock })
+      // mock資料 
+      this.UserMock = createModelMock('User', [
+        {
+          id: 1,
+          email: 'root@example.com',
+          name: 'root',
+          isAdmin: true,
+        }
+      ])
+      // mock adminController
+      this.adminController = createControllerProxy('../controllers/admin-controller', { User:this.UserMock })
     })
-    
-    // 開始測試
-    context('# [顯示使用者清單]', () => {
-      it(' GET /admin/users ', async () => {
-        // 模擬 request & response & next
-        const req = mockRequest() // 對 GET /admin/users 發出請求
+
+    //開始測試
+    context('[顯示使用者清單]', () => {
+      it('#5 GET /admin/users', async () => {
+        const req = mockRequest()
         const res = mockResponse()
         const next = mockNext
-
-        // 測試作業指定的 adminController.getUsers 函式
         await this.adminController.getUsers(req, res, next)
-
-        // getUser 正確執行的話，應呼叫 res.render
-        // res.render 的第 2 個參數應是 users
-        // 根據測試資料，users 中的第 1 筆資料，name 屬性值應該要是 'admin'
-        res.render.getCall(0).args[1].users[0].name.should.equal('admin')
+        // expect(res.render.getCall(0).args[1].users[0].name).to.equal('admin')
+        res.render.getCall(0).args[1].users[0].name.should.equal('root')
       })
     })
 
-    context('# [修改使用者權限] for root', () => {
-      before(() => {
-      // 製作假資料
-      // 本 context 會用這筆資料進行測試
-        this.UserMock = createModelMock(
-          'User', 
-          [{
-            id: 1,
-            email: 'root@example.com',
-            name: 'admin',
-            isAdmin: true, // 是管理者
-          }]
-        )
-        
-        // 將 adminController 中的 User db 取代成 User mock db
-        this.adminController = createControllerProxy('../controllers/admin-controller', { User: this.UserMock })
-      })
-
-      it(' PATCH /admin/users/:id ', async () => {
-        // 模擬 request & response & next
-        const req = mockRequest({ params: { id: 1 } }) // 帶入 params.id = 1，對 PATCH /admin/users/1 發出請求
+    context('[修改使用者權限] root', () => {
+      it('#6 PATCH /admin/users/:id', async () => {
+        // 模擬 params.id = 1 的req
+        const req = mockRequest({ params: { id: 1 } })
         const res = mockResponse()
         const next = mockNext
-
-       // 測試作業指定的 adminController.patchUser 函式
         await this.adminController.patchUser(req, res, next)
 
-        // patchUser 正確執行的話，應呼叫 req.flash
-        // req.flash 的參數應該要與下列字串一致
-        req.flash.calledWith('error_messages','禁止變更 root 權限').should.be.true
-
-        // patchUser 執行完畢，應呼叫 res.redirect 並重新導向上一頁 
+        // calledWith 方法用来检查一个 spy 或 stub 是否被以指定的参数调用过
+        // 延伸用法spy.calledWith('A', 'B', 'C', 'D')
+        req.flash.calledWith('error_messages', '禁止變更 root 權限').should.be.true
         res.redirect.calledWith('back').should.be.true
       })
     })
 
-    context('# [修改使用者權限] for user (user -> admin)', () => {
+    context('[修改使用者權限] user -> admin ', () => {
       before(() => {
-        // 製作假資料
-        // 本 context 會用這筆資料進行測試
-        this.UserMock = createModelMock(
-          'User',
-          [{
-            id: 1,
-            email: 'user@example.com',
-            name: 'user',
-            isAdmin: false, // 非管理者
-          }]
-        )
-        // 將 adminController 中的 User db 取代成 User mock db
+        this.UserMock = createModelMock('User', [{
+          id: 2,
+          email: 'user2@example.com',
+          name: 'user2',
+          isAdmin: false
+        }])
         this.adminController = createControllerProxy('../controllers/admin-controller', { User: this.UserMock })
       })
 
-      it(' PATCH /admin/users/:id ', async () => {
-        // 模擬 request & response & next
-        const req = mockRequest({ params: { id: 1 } }) // 帶入 params.id = 1，對 PATCH /admin/users/1 發出請求
+      it('#7 PATCH /admin/users/:id', async () => {
+        const req = mockRequest({ params: { id: 2 } })
         const res = mockResponse()
         const next = mockNext
-
-        // 測試作業指定的 adminController.patchUser 函式
         await this.adminController.patchUser(req, res, next)
 
-        // patchUser 正確執行的話，應呼叫 req.flash 
-        // req.flash 的參數應與下列字串一致
-        req.flash.calledWith('success_messages','使用者權限變更成功').should.be.true
-        // patchUser 執行完畢，應呼叫 res.redirect 並重新導向 /admin/users
-        res.redirect.calledWith('/admin/users').should.be.true
-
-        // patchUser 執行完畢後，假資料中 id:1 使用者的應該要是 isAdmin：true
-        // 將假資料撈出，比對確認有成功修改到
-        const user = await this.UserMock.findOne({ where: { id: 1 } })
-        user.isAdmin.should.equal(true)
+        const user = await this.UserMock.findOne({
+          where: { id: 2 } 
+        })
+      
+        expect(req.flash.calledWith('success_messages', '使用者權限變更成功')).to.be.true
+        expect(res.redirect.calledWith('/admin/users')).to.be.true
+        expect(user.isAdmin).to.equal(true)
       })
     })
 
-    context('# [修改使用者權限] for user (admin -> user)', () => {
+    //
+    context('[修改使用者權限] admin -> user ', () => {
       before(() => {
-        // 製作假資料
-        // 本 context 會用這筆資料進行測試
-        this.UserMock = createModelMock(
-          'User',
-          [{
-            id: 2,
-            email: 'user2@example.com',
-            name: 'user2',
-            isAdmin: true // 是管理者
-          }]
-        )
-        // 將 adminController 中的 User db 取代成 User mock db
+        this.UserMock = createModelMock('User', [{
+          id: 2,
+          email: 'user2@example.com',
+          name: 'user2',
+          isAdmin: true
+        }])
         this.adminController = createControllerProxy('../controllers/admin-controller', { User: this.UserMock })
       })
 
-      it(' PATCH /admin/users/:id ', async () => {
-        // 模擬 request & response & next
-        const req = mockRequest({ params: { id: 2 } }) // 帶入 params.id = 2，對 PATCH /admin/users/2 發出請求
+      it('#8 PATCH /admin/users/:id', async () => {
+        const req = mockRequest({ params: { id: 2 } })
         const res = mockResponse()
         const next = mockNext
-
-        // 測試作業指定的 adminController.patchUser 函式
         await this.adminController.patchUser(req, res, next)
 
-        // patchUser 正確執行的話，應呼叫 req.flash 
-        // req.flash 的參數應與下列字串一致
-        req.flash.calledWith('success_messages','使用者權限變更成功').should.be.true
-        // patchUser 執行完畢，應呼叫 res.redirect 並重新導向 /admin/users
-        res.redirect.calledWith('/admin/users').should.be.true
-
-        // patchUser 執行完畢後，假資料中 id:2 使用者的應該要是 isAdmin：false
-        // 將假資料撈出，比對確認有成功修改到
-        const user = await this.UserMock.findOne({ where: { id: 2 } })
-        user.isAdmin.should.equal(false)
+        const user = await this.UserMock.findOne({
+          where: { id: 2 } 
+        })
+      
+        expect(req.flash.calledWith('success_messages', '使用者權限變更成功')).to.be.true
+        expect(res.redirect.calledWith('/admin/users')).to.be.true
+        expect(user.isAdmin).to.equal(false)
       })
     })
   })
+  
 })

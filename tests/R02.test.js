@@ -1,60 +1,69 @@
-const chai = require('chai')
-const request = require('supertest')
-const sinon = require('sinon')
-const should = chai.should()
+const { expect } = require('chai')
+const { createModelMock, createControllerProxy, mockRequest, mockResponse, mockNext } = require('../helpers/unit-test-helper')
 
-const { createModelMock, createControllerProxy, mockRequest, mockResponse, mockNext } = require('../helpers/unit-test-helper');
-
-describe('# R02: 餐廳資訊整理：Dashboard', function () {
-  context('# [Q1: Dashboard - 1 - controller / view / route]', () => {
-    before(async () => {
-      // 製作假資料
-      // 本 context 會用這筆資料進行測試
-      this.UserMock = createModelMock('User', [{
+describe(' R02 測試餐廳Dashboard', () => {
+  context('[Dashboard route -> controller -> view]', () => {
+    // mock models data
+    this.UserMock = createModelMock('User', [
+      {
         id: 1,
         email: 'root@example.com',
-        name: 'admin',
-        isAdmin: false,
-      }])
-      this.RestaurantMock = createModelMock('Restaurant', [{
+        name: 'root',
+        isAdmin: true
+      }
+    ])
+    this.RestaurantMock = createModelMock('Restaurant', [
+      {
         id: 1,
-        name: '銷魂麵',
-        viewCounts: 3
-      }])
-      this.CategoryMock = createModelMock('Category', [{
+        name: '拉麵',
+        viewCount: 3
+      }
+    ])
+    this.CategoryMock = createModelMock('Category', [
+      {
         id: 1,
-        name: '食物'
-      }])
-      this.CommentMock = createModelMock('Comment', [{
+        name: '日式'
+      }
+    ])
+    this.CommentMock = createModelMock('Comment', [
+      {
         id: 1,
-        text: "gogogo"
-      }])
+        text: '好吃又便宜'
+      }
+    ])
 
-      // 連向模擬的 tables
-      this.restController = createControllerProxy('../controllers/restaurant-controller', { 
-        User: this.UserMock, 
-        Category: this.CategoryMock, 
-        Restaurant: this.RestaurantMock,
-        Comment: this.CommentMock,
-      })
+    // 載入controller, 輸入mock資料
+    this.restController = createControllerProxy('../controllers/restaurant-controller', {
+      User: this.UserMock,
+      Category: this.CategoryMock,
+      Restaurant: this.RestaurantMock,
+      Comment: this.CommentMock
     })
 
-    it(' GET /restaurants/:id/dashboard ', async () => {
-      // 模擬 request & response & next
-      const req = mockRequest({ params: { id: 1 } }) // 帶入 params.id = 1，對 GET /restaurants/1/dashboard 發出請求
+    // 開始測試
+    it(' #9 GET /restaurants/:id/dashboard', async () => {
+      // 載入req res next
+      const req = mockRequest({ params: { id: 1 } })
       const res = mockResponse()
       const next = mockNext
-      
-      // 測試 restController.getDashBoard 函式
+
+      // 執行mock controller
       await this.restController.getDashboard(req, res, next)
 
-      // getDashBoard 正確執行的話，應呼叫 res.render
-      // res.render 的第 1 個參數要是 'dashboard'
-      // res.render 的第 2 個參數要包含 restaurant，其 name 屬性的值應是 '銷魂麵'
-      // res.render 的第 2 個參數要包含 restaurant，其 viewCounts 值應該是 3
-      res.render.getCall(0).args[0].should.equal('dashboard')
-      res.render.getCall(0).args[1].restaurant.name.should.equal('銷魂麵')
-      res.render.getCall(0).args[1].restaurant.viewCounts.should.equal(3)
+      // 檢驗結果
+      // res.render.getCall(0)  -> res.render第1次被調用
+      // 裡面常用的有
+      // args: 一个数组，包含该次调用的所有参数。
+      // returnValue: 函数调用的返回值。
+      // exception: 如果调用时抛出异常，这里会包含该异常对象。
+      // calledWith(arg1, arg2, ...): 一个方法，用来检查函数是否用特定的参数被调用。
+      expect(res.render.getCall(0).args[0]).to.equal('dashboard')
+      expect(res.render.getCall(0).args[1].restaurant.name).to.equal('拉麵')
+      expect(res.render.getCall(0).args[1].restaurant.viewCount).to.equal(3)
+
+      
     })
+      //應該還要加測. comment mockComment後會不會增加,  mockGet之後會不會增加
   })
+
 })
