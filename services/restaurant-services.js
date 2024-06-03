@@ -1,6 +1,7 @@
 const { Restaurant, Category, Comment, User, Favorite } = require('../models')
 const { getOffset, getPagination } = require('../helpers/pagination-helper')
 
+
 const restaurantServices = {
   getRestaurants: (req, cb) => {
     const DEFAULT_LIMIT = 9
@@ -13,7 +14,11 @@ const restaurantServices = {
     return Promise.all([
       Restaurant.findAndCountAll({
         where: { ...categoryId ? { categoryId } : {} },
-        include: Category,
+        include: {
+          model: Category,
+          attributes: ['name'] // RDS 只選擇name欄位
+        },
+        attributes: ['id', 'name', 'description', 'image'],
         order:[[ 'createdAt', orderMethod ]],
         limit,
         offset,
@@ -59,11 +64,13 @@ const restaurantServices = {
         restaurant.increment('viewCounts')
         const isFavorited = restaurant.FavoritedUsers && restaurant.FavoritedUsers.some(f => f.id === req.user.id)
         const isLiked = restaurant.LikedUser && restaurant.LikedUser.some(l => l.id === req.user.id)
-        return cb(null, {
+        const result = {
           restaurant: restaurant.toJSON(),
           isFavorited,
           isLiked
-        })
+        }
+        return cb(null, result)
+
       })
       .catch(err => cb(err))
   },
@@ -88,16 +95,26 @@ const restaurantServices = {
   getFeeds:  (req, cb) => {
     return Promise.all([
       Restaurant.findAll({
+        // RDS 只選擇必要的欄位 
+        attributes: ['id', 'name', 'image', 'createdAt'],
         limit: 10,
         order: [['createdAt', 'DESC']],
-        include: [Category],
+        // RDS 只選擇必要的欄位
+        include: {
+          model: Category,
+          attributes: ['name'] 
+        },
         raw: true,
         nest: true
       }),
       Comment.findAll({
+        attributes: ['id', 'text', 'createdAt'],
         limit: 10,
         order: [['createdAt', 'DESC']],
-        include: [User, Restaurant],
+        include: [
+          { model: User, attributes: ['id', 'name', 'image'] }, // 只選擇必要的欄位
+          { model: Restaurant, attributes: ['id', 'name', 'image'] } // 只選擇必要的欄位
+        ],
         raw: true,
         nest: true
       })
@@ -109,10 +126,11 @@ const restaurantServices = {
   },
   getTopRestaurants: (req, cb) => {
     return Restaurant.findAll({
+      attributes: ['id', 'name', 'image'],
       include: [
-        Category,
-        { model: User, as: 'FavoritedUsers' }
-      ],
+        { model: Category, attributes: ['name'] }, // 只選擇必要的欄位
+        { model: User, as: 'FavoritedUsers', attributes: ['id'] } // 只選擇必要的欄位
+      ]
     })
     .then(restaurants => {
       const result = restaurants

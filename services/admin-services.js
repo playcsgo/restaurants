@@ -3,10 +3,15 @@ const { imgurFileHandler } = require('../helpers/file-help')
 
 const adminServices = {
   getRestaurants: (req, cb) => {
+    // RDS#1 只選擇需要的欄位
     return Restaurant.findAll({
+      attributes: ['id', 'name', 'image'],
       raw: true,
       nest: true,
-      include: [Category]
+      include: {
+        model: Category,
+        attributes: ['name']
+      }
     })
     .then(restaurants => cb(null, { restaurants }))
     .catch(err => cb(err))
