@@ -8,8 +8,8 @@ const commentController = {
     if (!text) throw new Error('Comment is empty!')
 
     return Promise.all([
-      User.findByPk(userId),
-      Restaurant.findByPk(restaurantId)
+      User.findByPk(userId, { attributes: ['id'] }), // RDS#2 只選擇必要欄位
+      Restaurant.findByPk(restaurantId, { attributes: ['id'] }) // RDS#2 只選擇必要欄位
     ]).then(([user, restaurant]) => {
       if (!user) throw new Error('user does not exist!')
       if (!restaurant) throw new Error('restaurant does not exist!')
