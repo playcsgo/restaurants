@@ -18,7 +18,7 @@ const userController = {
     })
   },
   signInPage: (req, res) => {
-    res.render('signin')
+    res.render('signin', { hideContainer: true })
   },
   signIn: (req, res) => {
     req.flash('success_messages', '成功登入')
@@ -27,7 +27,7 @@ const userController = {
   logout: (req, res) => {
     req.flash('success_messages', '成功登出')
     req.logout()
-    res.redirect('/signin')
+    res.redirect('/signin', )
   },
   getUser: (req, res, next) => {
     userService.getUser(req, (err, data) => err ? next(err) : res.render('users/profile', {
