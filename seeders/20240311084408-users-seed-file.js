@@ -26,6 +26,14 @@ module.exports = {
       created_at: new Date(),
       updated_at: new Date()
     },{
+      email: 'user3@example.com',
+      password: await bcrypt.hash('12345678', 10),
+      is_admin: false,
+      name: 'user2',
+      image: "https://i.imgur.com/kqNaaqZ.jpeg",
+      created_at: new Date(),
+      updated_at: new Date()
+    },{
       email: 'test',
       password: await bcrypt.hash('test', 10),
       is_admin: true,
