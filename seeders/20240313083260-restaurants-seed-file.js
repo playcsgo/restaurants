@@ -9,7 +9,7 @@ module.exports = {
     )
     await queryInterface.bulkInsert('Restaurants', 
       Array.from({ length: 50 }, (v, k) => ({
-        name: k,
+        name: `${k+1}號餐廳`,
         tel: faker.phone.phoneNumber(),
         address: faker.address.streetAddress(),
         opening_hour: '08:00',

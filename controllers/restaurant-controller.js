@@ -2,7 +2,7 @@ const { Restaurant, Category, Comment, User, Favorite } = require('../models')
 const restaurantServices = require('../services/restaurant-services')
 
 restaurantControllers = {
-  getRestaurants: (req, res, next) => {
+  getRestaurants: async (req, res, next) => {
     restaurantServices.getRestaurants(req, (err, data) => err ? next(err) : res.render('restaurants', data))
   },
   getRestaurant: (req, res, next) => {

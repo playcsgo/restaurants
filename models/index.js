@@ -4,16 +4,28 @@ const path = require('path')
 const Sequelize = require('sequelize')
 const basename = path.basename(__filename)
 const env = process.env.NODE_ENV || 'development'
-const config = require(path.resolve(__dirname, '../config/config.json'))[env]
-// const config = require(path.resolve(__dirname, '../config/sql-config.js'))[env]
+// const config = require(path.resolve(__dirname, '../config/config.json'))[env]
+const config = require(path.resolve(__dirname, '../config/sql-config.js'))[env]
 const db = {}
+
+let queryCount = 0
 
 // 與資料庫連線
 let sequelize
 if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], { ...config, logging: false },)
+  sequelize = new Sequelize(process.env[config.use_env_variable], {
+    ...config, 
+    logging: () => {
+      queryCount++
+    }
+  },)
 } else {
-  sequelize = new Sequelize(config.database, config.username, config.password, { ...config, logging: false })
+  sequelize = new Sequelize(config.database, config.username, config.password, {
+    ...config, 
+    logging: () => {
+      queryCount++
+    }
+  })
 }
 // 動態引入其他 models
 fs
@@ -35,5 +47,7 @@ Object.keys(db).forEach(modelName => {
 // 匯出需要的物件
 db.sequelize = sequelize
 db.Sequelize = Sequelize
+db.getQueryCount = () => queryCount
+db.resetQueryCount = () => { queryCount = 0 }
 
 module.exports = db

@@ -1,0 +1,113 @@
+# 定義models中的Table/columns
+
+type User {
+  id: ID!
+  # from init columns
+  name: String
+  email: String
+  # password: String
+  isAdmin: Boolean
+  image: String
+  createdAt: String
+  updatedAt: String
+
+  # from associate models
+  # 資料結構為該type (model)
+  # 多對多的話  以 as: 呈現
+  Comments: [Comment]
+  FavoritedRestaurants: [Restaurant]
+  LikedRestaurants: [Restaurant]
+  Followers: [User]
+  Followings: [User]
+  
+  # 其他方便前端直接使用的資料
+  commentsCount: Int
+  favoritedCount: Int
+  likedCount: Int
+  followingsCount: Int
+  followersCount: Int
+  isFollowed: Boolean
+}
+
+type Category {
+  id: ID!
+  name: String
+  Restaurant: [Restaurant]
+  createdAt: String
+  updatedAt: String
+}
+
+type Comment {
+  # id: ID!
+  text: String
+  userId: Int
+  restaurantId: Int
+  Restaurant: [Restaurant]
+  User: [User]
+  createdAt: String
+  updatedAt: String
+}
+
+type Favorite {
+  # id: ID!
+  userId: Int!
+  restaurantId: Int!
+  createdAt: String
+  updatedAt: String
+}
+
+type Followship {
+  # id: ID!
+  followerId: Int,
+  followingId: Int
+  createdAt: String
+  updatedAt: String
+}
+
+type Like {
+  # id: ID!
+  userId: Int!
+  restaurantId: Int!
+  createdAt: String
+  updatedAt: String
+}
+
+type Restaurant {
+  id: ID!
+  name: String
+  tel: String
+  openingHour: String
+  description: String
+  address: String
+  image: String
+  viewCounts: Int
+  
+  Category: Category
+  Comments: [Comment]
+  FavoritedUsers: [User]
+  LikedUser: [User]
+  createdAt: String
+  updatedAt: String
+}
+
+type Query {
+  users : [User],
+  user(id: ID!): User,
+  reqUser: User,
+  restaurants(limit: Int, page: Int, query_categoryId: Int): [Restaurant],
+  example: User
+  queryCount: Int
+}
+
+type AuthPayload {
+  token: String
+  user: User
+}
+
+type Mutation {
+  signin(email: String!, password: String!): AuthPayload,
+  favorite(restaurantId: Int!): Favorite,
+  like(restaurantId: Int!): Like,
+  comment(restaurantId: Int!, text: String!): Comment,
+  followship(followingId: Int!): Followship
+}

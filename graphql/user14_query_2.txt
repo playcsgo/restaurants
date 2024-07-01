@@ -1,0 +1,40 @@
+[userJson] {
+  id: 14,
+  name: 'user1',
+  Comments: [
+    { id: 3, text: '老闆人很好,  說吃不飽的話再點一次就好' },
+    { id: 4, text: '手沖咖啡要等很久,  趕飛機不要點' },
+    { id: 5, text: '不好找,  在沙灘裡面' }
+  ],
+  FavoritedRestaurants: [
+    {
+      id: 102,
+      name: '2號餐廳',
+      image: 'https://loremflickr.com/320/240/restaurant/?random=89.19846043168116',
+      Favorite: [Object]
+    },
+    {
+      id: 103,
+      name: '3號餐廳',
+      image: 'https://loremflickr.com/320/240/restaurant/?random=62.06043845281193',
+      Favorite: [Object]
+    },
+    {
+      id: 104,
+      name: '4號餐廳',
+      image: 'https://loremflickr.com/320/240/restaurant/?random=79.5998813192945',
+      Favorite: [Object]
+    },
+    {
+      id: 101,
+      name: '1號餐廳',
+      image: 'https://loremflickr.com/320/240/restaurant/?random=92.52604744471668',
+      Favorite: [Object]
+    }
+  ],
+  commentsCount: 3,
+  favoritedCount: 4,
+  likedCount: 0,
+  followersCount: 0,
+  followingsCount: 0
+}

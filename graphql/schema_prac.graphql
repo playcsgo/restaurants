@@ -1,0 +1,120 @@
+# 定義基本字段的接口
+interface Basic {
+  id: ID!
+  createdAt: String
+  updatedAt: String
+}
+
+# User 類型
+type User implements Basic {
+  id: ID!
+  createdAt: String
+  updatedAt: String
+  name: String!
+  email: String!
+  password: String!
+  isAdmin: Boolean!
+  image: String
+
+  comments: [Comment]
+  favoritedRestaurants: [Restaurant] @relation(name: "Favorite")
+  likedRestaurants: [Restaurant] @relation(name: "Like")
+  followers: [User] @relation(name: "Followship")
+  followings: [User] @relation(name: "Followship")
+
+  commentsCount: Int
+  favoritedCount: Int
+  followingsCount: Int
+  followersCount: Int
+  isFollowed: Boolean
+}
+
+# Restaurant 類型
+type Restaurant implements Basic {
+  id: ID!
+  createdAt: String
+  updatedAt: String
+  name: String!
+  tel: String
+  openingHour: String
+  description: String
+  address: String
+  image: String
+  viewCounts: Int
+  category: Category
+  comments: [Comment]
+  favoritedUsers: [User] @relation(name: "Favorite")
+  likedUsers: [User] @relation(name: "Like")
+}
+
+# Category 類型
+type Category implements Basic {
+  id: ID!
+  createdAt: String
+  updatedAt: String
+  name: String!
+  restaurants: [Restaurant]
+}
+
+# Comment 類型
+type Comment implements Basic {
+  id: ID!
+  createdAt: String
+  updatedAt: String
+  text: String!
+  userId: Int!
+  restaurantId: Int!
+  user: User
+  restaurant: Restaurant
+}
+
+# Favorite 類型作為中間類型來表示多對多關係
+type Favorite implements Basic {
+  id: ID!
+  createdAt: String
+  updatedAt: String
+  userId: Int!
+  restaurantId: Int!
+  user: User
+  restaurant: Restaurant
+}
+
+# Followship 類型
+type Followship implements Basic {
+  id: ID!
+  createdAt: String
+  updatedAt: String
+  followerId: Int!
+  followingId: Int!
+  follower: User
+  following: User
+}
+
+# Like 類型
+type Like implements Basic {
+  id: ID!
+  createdAt: String
+  updatedAt: String
+  userId: Int!
+  restaurantId: Int!
+  user: User
+  restaurant: Restaurant
+}
+
+# 定義查詢
+type Query {
+  user(id: ID!): User
+  users: [User]
+  category(id: ID!): Category
+  categories: [Category]
+  restaurant(id: ID!): Restaurant
+  restaurants: [Restaurant]
+  comment(id: ID!): Comment
+  comments: [Comment]
+  favorite(id: ID!): Favorite
+  favorites: [Favorite]
+  followship(id: ID!): Followship
+  followships: [Followship]
+  like(id: ID!): Like
+  likes: [Like]
+}

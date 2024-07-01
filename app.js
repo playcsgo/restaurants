@@ -19,6 +19,8 @@ const path = require('path')
 const routes = require('./routes')
 const cors = require('cors')
 
+
+
 app.use(
   cors({
     origin: '*',
@@ -53,10 +55,21 @@ app.use((req, res, next) => {
 app.use(methodOverride('_method'))
 app.use('/upload', express.static(path.join(__dirname, 'upload')))
 
+//GraphQL
+const startApolloServer = require('./graphql/apolloServer')
+startApolloServer(app).then(() => {
+  console.log('Apollo Server started')
+}).catch(err => {
+  console.error('Error starting Apollo Server:', err)
+})
+
+
 app.use(routes)
 
+
+
 app.listen(port, () => {
-  console.info(`Example app listening on port ${port}!`)
+  console.info(`Express app listening on port ${port}!`)
 })
 
 module.exports = app

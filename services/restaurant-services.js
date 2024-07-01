@@ -1,15 +1,39 @@
 const { Restaurant, Category, Comment, User, Favorite } = require('../models')
 const { getOffset, getPagination } = require('../helpers/pagination-helper')
+const {redisClient, getCache } = require('../config/redis')
+const DEFAULT_EXPIRATION = 600
 
 
 const restaurantServices = {
-  getRestaurants: (req, cb) => {
+  getRestaurants: async (req, cb) => {
     const DEFAULT_LIMIT = 9
     const orderMethod = req.query.order || 'DESC'
     const limit = +req.query.limit || DEFAULT_LIMIT
     const page = +req.query.page || 1
     const offset = Math.max(getOffset(limit, page), 0)
     const categoryId = Number(req.query.categoryId) || ''
+
+    //search cache
+    const cacheKey = `restaurants_${categoryId}_${limit}_${offset}_${page}`
+    
+    try {
+      const cacheData = await redisClient.get(cacheKey)
+      if (cacheData) {
+        const cacheResult = JSON.parse(cacheData)
+        const favoritedRestaurantsId = req.user?.FavoritedRestaurants ? req.user.FavoritedRestaurants.map(fr => fr.id): [] 
+        const likedRestaurantsId = req.user?.LikedRestaurants ? req.user.LikedRestaurants.map(lr => lr.id) : []
+        cacheResult.restaurants = cacheResult.restaurants.map(r => ({
+          ...r,
+          description: r.description && r.description.substring(0, 20),
+          isFavorited: favoritedRestaurantsId.includes(r.id),
+          isLiked: likedRestaurantsId.includes(r.id)
+        }))
+
+        return cb(null, cacheResult)
+      }
+    } catch(err) {
+      throw new Error('Error Cache')
+    }
 
     return Promise.all([
       Restaurant.findAndCountAll({
@@ -26,7 +50,7 @@ const restaurantServices = {
         nest: true
       }),
       Category.findAll({ raw: true })
-    ]).then(([restaurants, categories ]) => {
+    ]).then(async ([restaurants, categories ]) => {
       // aa.bb.cc.dd
       // aa && aa.bb && aa.bb.cc && aa.bb.cc.dd && ....
       // aa?.bb?.cc?.dd
@@ -38,6 +62,16 @@ const restaurantServices = {
         isFavorited: favoritedRestaurantsId.includes(r.id),
         isLiked: likedRestaurantsId.includes(r.id)
       }))
+      // set cache
+
+      const cacheData = {
+        restaurants: data,
+        categories,
+        categoryId,
+        pagination: getPagination(limit, page, restaurants.count)
+      }
+      await redisClient.setEx(cacheKey, DEFAULT_EXPIRATION, JSON.stringify(cacheData))
+      
       return cb(null, {
         restaurants: data,
         categories,

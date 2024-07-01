@@ -1,0 +1,11 @@
+{
+  "data": {
+    "signin": {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQsIm5hbWUiOiJ1c2VyMSIsImVtYWlsIjoidXNlcjFAZXhhbXBsZS5jb20iLCJpc0FkbWluIjpmYWxzZSwiaW1hZ2UiOiJodHRwczovL2kuaW1ndXIuY29tLzRXOUlxbWoucG5nIiwiY3JlYXRlZEF0IjoiMjAyNC0wNi0yN1QwMTowNzozOS4wMDBaIiwidXBkYXRlZEF0IjoiMjAyNC0wNi0yN1QyMDoyMzoyNy4wMDBaIiwiaWF0IjoxNzE5NTg1NDAxLCJleHAiOjE3MjIxNzc0MDF9._1OsRy7BeDlUoI3SnGSoWSTtWCEdikqxu9UCiaXONfo",
+      "user": {
+        "id": "14",
+        "name": "user1"
+      }
+    }
+  }
+}

@@ -14,6 +14,7 @@ module.exports = {
       password: await bcrypt.hash('12345678', 10),
       is_admin: false,
       name: 'user1',
+      image: "https://i.imgur.com/4W9Iqmj.png",
       created_at: new Date(),
       updated_at: new Date()
     }, {
@@ -21,6 +22,7 @@ module.exports = {
       password: await bcrypt.hash('12345678', 10),
       is_admin: false,
       name: 'user2',
+      image: "https://i.imgur.com/kqNaaqZ.jpeg",
       created_at: new Date(),
       updated_at: new Date()
     },{

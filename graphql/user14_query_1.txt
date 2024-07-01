@@ -1,0 +1,194 @@
+[userJson] {
+  id: 14,
+  name: 'user1',
+  email: 'user1@example.com',
+  password: '$2a$10$PSVhfcxixTy8.5O3R9nP6u3keXDfrOOFWLlba5RGNBPse2RVGmg1e',
+  isAdmin: false,
+  image: 'https://i.imgur.com/4W9Iqmj.png',
+  createdAt: 2024-06-27T01:07:39.000Z,
+  updatedAt: 2024-06-27T20:23:27.000Z,
+  Comments: [
+    {
+      id: 3,
+      text: '老闆人很好,  說吃不飽的話再點一次就好',
+      userId: 14,
+      restaurantId: 102,
+      createdAt: 2024-06-27T01:23:48.000Z,
+      updatedAt: 2024-06-27T01:23:48.000Z
+    },
+    {
+      id: 4,
+      text: '手沖咖啡要等很久,  趕飛機不要點',
+      userId: 14,
+      restaurantId: 103,
+      createdAt: 2024-06-27T01:24:09.000Z,
+      updatedAt: 2024-06-27T01:24:09.000Z
+    },
+    {
+      id: 5,
+      text: '不好找,  在沙灘裡面',
+      userId: 14,
+      restaurantId: 109,
+      createdAt: 2024-06-27T21:01:30.000Z,
+      updatedAt: 2024-06-27T21:01:30.000Z
+    }
+  ],
+  FavoritedRestaurants: [
+    {
+      id: 102,
+      name: '2號餐廳',
+      tel: '(378) 492-9505 x5805',
+      openingHour: '08:00',
+      description: 'Consequuntur tempore qui ex quo qui nam qui iure at. Veniam ex distinctio animi tenetur voluptates i',
+      address: '348 Okuneva Stravenue',
+      image: 'https://loremflickr.com/320/240/restaurant/?random=89.19846043168116',
+      viewCounts: 4,
+      createdAt: 2024-06-27T01:07:50.000Z,
+      updatedAt: 2024-06-27T01:24:16.000Z,
+      categoryId: 19,
+      Favorite: [Object]
+    },
+    {
+      id: 103,
+      name: '3號餐廳',
+      tel: '(924) 536-9300 x4236',
+      openingHour: '08:00',
+      description: 'Dignissimos reiciendis quis officiis. Qui voluptatem eaque corporis quae omnis sed doloremque modi. ',
+      address: '4552 Remington Forges',
+      image: 'https://loremflickr.com/320/240/restaurant/?random=62.06043845281193',
+      viewCounts: 2,
+      createdAt: 2024-06-27T01:07:50.000Z,
+      updatedAt: 2024-06-27T01:24:09.000Z,
+      categoryId: 17,
+      Favorite: [Object]
+    },
+    {
+      id: 104,
+      name: '4號餐廳',
+      tel: '1-258-505-8739 x4001',
+      openingHour: '08:00',
+      description: 'nesciunt',
+      address: '1526 Haley Islands',
+      image: 'https://loremflickr.com/320/240/restaurant/?random=79.5998813192945',
+      viewCounts: 0,
+      createdAt: 2024-06-27T01:07:50.000Z,
+      updatedAt: 2024-06-27T01:07:50.000Z,
+      categoryId: 21,
+      Favorite: [Object]
+    },
+    {
+      id: 101,
+      name: '1號餐廳',
+      tel: '1-631-489-0478 x37660',
+      openingHour: '08:00',
+      description: 'Est veniam quia earum ut. Eum ratione qui. Sit inventore perspiciatis.',
+      address: '069 Runolfsson Crescent',
+      image: 'https://loremflickr.com/320/240/restaurant/?random=92.52604744471668',
+      viewCounts: 0,
+      createdAt: 2024-06-27T01:07:50.000Z,
+      updatedAt: 2024-06-27T01:07:50.000Z,
+      categoryId: 16,
+      Favorite: [Object]
+    }
+  ],
+  LikedRestaurants: [
+    {
+      id: 102,
+      name: '2號餐廳',
+      tel: '(378) 492-9505 x5805',
+      openingHour: '08:00',
+      description: 'Consequuntur tempore qui ex quo qui nam qui iure at. Veniam ex distinctio animi tenetur voluptates i',
+      address: '348 Okuneva Stravenue',
+      image: 'https://loremflickr.com/320/240/restaurant/?random=89.19846043168116',
+      viewCounts: 4,
+      createdAt: 2024-06-27T01:07:50.000Z,
+      updatedAt: 2024-06-27T01:24:16.000Z,
+      categoryId: 19,
+      Like: [Object]
+    },
+    {
+      id: 103,
+      name: '3號餐廳',
+      tel: '(924) 536-9300 x4236',
+      openingHour: '08:00',
+      description: 'Dignissimos reiciendis quis officiis. Qui voluptatem eaque corporis quae omnis sed doloremque modi. ',
+      address: '4552 Remington Forges',
+      image: 'https://loremflickr.com/320/240/restaurant/?random=62.06043845281193',
+      viewCounts: 2,
+      createdAt: 2024-06-27T01:07:50.000Z,
+      updatedAt: 2024-06-27T01:24:09.000Z,
+      categoryId: 17,
+      Like: [Object]
+    },
+    {
+      id: 106,
+      name: '6號餐廳',
+      tel: '786.685.6171 x0280',
+      openingHour: '08:00',
+      description: 'Quaerat molestiae ab quo. Tempore qui deserunt. Delectus nisi possimus culpa.',
+      address: '8831 Columbus Circles',
+      image: 'https://loremflickr.com/320/240/restaurant/?random=17.292486707101595',
+      viewCounts: 0,
+      createdAt: 2024-06-27T01:07:50.000Z,
+      updatedAt: 2024-06-27T01:07:50.000Z,
+      categoryId: 15,
+      Like: [Object]
+    },
+    {
+      id: 109,
+      name: '9號餐廳',
+      tel: '1-454-741-1543 x28559',
+      openingHour: '08:00',
+      description: 'Voluptatem enim molestiae architecto assumenda numquam. Voluptas et incidunt. Et aut nihil provident',
+      address: '13350 Howard Trail',
+      image: 'https://loremflickr.com/320/240/restaurant/?random=88.87835418905965',
+      viewCounts: 2,
+      createdAt: 2024-06-27T01:07:50.000Z,
+      updatedAt: 2024-06-27T21:01:30.000Z,
+      categoryId: 15,
+      Like: [Object]
+    }
+  ],
+  Followers: [
+    {
+      id: 15,
+      name: 'user2',
+      email: 'user2@example.com',
+      password: '$2a$10$UiAC6mHGaf7iwj1UXXn1U.2d4aQHjPTRDYb7GyFocoLO/NOEWAJSu',
+      isAdmin: false,
+      image: 'https://i.imgur.com/kqNaaqZ.jpeg',
+      createdAt: 2024-06-27T01:07:40.000Z,
+      updatedAt: 2024-06-27T20:23:45.000Z,
+      Followship: [Object]
+    }
+  ],
+  Followings: [
+    {
+      id: 16,
+      name: 'test',
+      email: 'test',
+      password: '$2a$10$qFK9OMCkl73LZsPhKzuQAe97wcsWbSx9tVCRf7vXfz8z4cA1mtnJm',
+      isAdmin: true,
+      image: 'https://i.imgur.com/7BjXmRm.png',
+      createdAt: 2024-06-27T01:07:40.000Z,
+      updatedAt: 2024-06-27T01:07:40.000Z,
+      Followship: [Object]
+    },
+    {
+      id: 15,
+      name: 'user2',
+      email: 'user2@example.com',
+      password: '$2a$10$UiAC6mHGaf7iwj1UXXn1U.2d4aQHjPTRDYb7GyFocoLO/NOEWAJSu',
+      isAdmin: false,
+      image: 'https://i.imgur.com/kqNaaqZ.jpeg',
+      createdAt: 2024-06-27T01:07:40.000Z,
+      updatedAt: 2024-06-27T20:23:45.000Z,
+      Followship: [Object]
+    }
+  ],
+  commentsCount: 3,
+  favoritedCount: 4,
+  likedCount: 4,
+  followersCount: 1,
+  followingsCount: 2
+}

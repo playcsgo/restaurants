@@ -13,7 +13,12 @@
     "url": "git+https://github.com/ALPHACamp/forum-express-grading.git"
   },
   "dependencies": {
+    "@apollo/server": "^4.10.4",
+    "@graphql-tools/graphql-file-loader": "^8.0.0",
+    "@graphql-tools/load": "^8.0.0",
+    "@graphql-tools/schema": "^9.0.17",
     "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
     "connect-flash": "^0.1.1",
     "cors": "^2.8.5",
     "dayjs": "^1.11.10",
@@ -22,6 +27,8 @@
     "express-handlebars": "^7.1.2",
     "express-session": "^1.18.0",
     "faker": "^5.5.3",
+    "graphql": "^16.8.2",
+    "graphql-parse-resolve-info": "^4.13.0",
     "heroku-cli": "^7.0.9",
     "imgur": "^1.0.2",
     "jsonwebtoken": "^9.0.2",
