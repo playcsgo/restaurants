@@ -82,7 +82,7 @@ const resolvers = {
         throw new GraphQLError(err.message)
       }
     },
-    restaurants: async(_root, { limit = 9, page = 1, query_categoryId = '' }, { reqUser }, info) => {
+    restaurants: async(_root, { limit = 9, page = 0, query_categoryId = '' }, { reqUser }, info) => {
       try {
         // pagination
         const categoryId = Number(query_categoryId) || ''
@@ -108,7 +108,7 @@ const resolvers = {
             { model: User, as: 'LikedUser', attributes: LikedUserAttributes, raw: true },
           ],
           attributes: restaurantAttributes,
-          limit: 2,
+          limit,
           offset,
           nest: true
         })

@@ -16,7 +16,9 @@ const typeDefs = loadSchemaSync(path.join(__dirname, 'schema.graphql'), {
 const resolvers = require('./resolvers')
 const schema = makeExecutableSchema({ typeDefs, resolvers })
 const server = new ApolloServer({
-  schema
+  schema,
+  introspection: true,
+  playground: true
 })
 
 const startApolloServer = async (app) => {

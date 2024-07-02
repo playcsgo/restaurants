@@ -1,7 +1,7 @@
 const { Restaurant, Category, Comment, User, Favorite } = require('../models')
 const { getOffset, getPagination } = require('../helpers/pagination-helper')
 const {redisClient, getCache } = require('../config/redis')
-const DEFAULT_EXPIRATION = 600
+const DEFAULT_EXPIRATION = 60
 
 
 const restaurantServices = {
