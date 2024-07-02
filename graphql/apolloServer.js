@@ -7,6 +7,16 @@ const { loadSchemaSync } = require('@graphql-tools/load')
 const { GraphQLFileLoader } = require('@graphql-tools/graphql-file-loader')
 const path = require('path')
 const passport = require('../config/passport')
+const { ApolloServerPluginLandingPageLocalDefault } = require('@apollo/server/plugin/landingPage/default')
+
+// const cors = require('cors')
+// app.use(cors({
+//   origin: 'https://playcsgo.life/', 
+//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+//   allowedHeaders: ['Content-Type', 'Authorization'],
+//   credentials: true,
+//   preflightContinue: false,
+// }));
 
 
 
@@ -18,7 +28,8 @@ const schema = makeExecutableSchema({ typeDefs, resolvers })
 const server = new ApolloServer({
   schema,
   introspection: true,
-  playground: true
+  playground: true,
+  plugins: [ApolloServerPluginLandingPageLocalDefault()]
 })
 
 const startApolloServer = async (app) => {
